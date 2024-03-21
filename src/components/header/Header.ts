@@ -38,7 +38,7 @@ class Header {
     const button = this.#createSearchButton();
 
     const $anchor = dom.getElement<HTMLAnchorElement>(this.$target, '.header-anchor');
-    $anchor.href = '.';
+    $anchor.href = '/';
 
     const $form = dom.getElement(this.$target, '.search-box');
     $form.appendChild(button.$target);
