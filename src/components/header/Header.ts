@@ -22,7 +22,7 @@ class Header {
   template() {
     return /*html*/ `
       <h1>
-        <a href="./">
+        <a href="" class="header-anchor">
           <img src="./images/logo.png" alt="MovieList 로고" />
         </a>
       </h1>
@@ -36,6 +36,9 @@ class Header {
   render() {
     this.$target.innerHTML += this.template();
     const button = this.#createSearchButton();
+
+    const $anchor = dom.getElement<HTMLAnchorElement>(this.$target, '.header-anchor');
+    $anchor.href = '.';
 
     const $form = dom.getElement(this.$target, '.search-box');
     $form.appendChild(button.$target);
