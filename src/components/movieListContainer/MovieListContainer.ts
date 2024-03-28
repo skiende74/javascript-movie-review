@@ -5,58 +5,69 @@ import { dom } from '../../utils/dom';
 import MovieItem from '../movieItem/MovieItem';
 import { InvalidRequestError } from '../../errors/error';
 
+const MOVIE_ITEM_SKELETON_COUNT = 20;
+const TEMPLATE = `<li>
+  <a href="#">
+    <div class="item-card">
+      <div class="item-thumbnail skeleton"></div>
+      <div class="item-title skeleton"></div>
+      <div class="item-score skeleton"></div>
+    </div>
+  </a>
+</li>`.repeat(MOVIE_ITEM_SKELETON_COUNT);
+
 class MovieListContainer {
   $target: HTMLUListElement = document.createElement('ul');
   page = 1;
+  moviesCount = 0;
 
   constructor() {
     this.$target.classList.add('item-list');
-    this.$target.innerHTML += this.template();
-    (async () => {
-      try {
-        const { movies, totalPages } = await this.fetchMovies(this.page);
-        await this.paint(movies);
-
-        if (this.$target.parentElement === null) return;
-        const $moreButton = dom.getElement(this.$target.parentElement, '#more-button');
-        if (this.page === totalPages) $moreButton.classList.add('hidden');
-      } catch (e) {
-        const target = e as InvalidRequestError;
-        this.handleErrorToast(target.message);
-      }
-    })();
+    this.render();
   }
 
-  template() {
-    return `<li>
-              <a href="#">
-                <div class="item-card">
-                <div class="item-thumbnail skeleton"></div>
-                <div class="item-title skeleton"></div>
-                <div class="item-score skeleton"></div>
-                </div>
-              </a>
-            </li>`.repeat(20);
+  async render() {
+    this.$target.innerHTML = TEMPLATE;
+    this.initPageNumber();
+
+    try {
+      const { movies, totalPages } = await this.fetchMovies(this.page);
+      this.paintOverwrite(movies);
+
+      if (this.$target.parentElement === null) return;
+      const $moreButton = dom.getElement(this.$target.parentElement, '#more-button');
+      if (this.page === totalPages) $moreButton.classList.add('hidden');
+      else $moreButton.classList.remove('hidden');
+    } catch (e) {
+      const target = e as InvalidRequestError;
+      this.handleErrorToast(target.message);
+    }
   }
 
-  async paint(movies: IMovie[]) {
-    this.$target.replaceChildren();
-    this.$target.append(...movies.map(movie => new MovieItem(movie).$target));
+  paintOverwrite(movies: IMovie[]) {
+    movies.forEach(movie => {
+      this.$target.replaceChild(new MovieItem(movie).$target, this.$target.children[this.moviesCount]);
+      this.moviesCount += 1;
+    });
+    this.#deleteLastItems(this.$target.children.length - this.moviesCount);
+  }
+
+  #deleteLastItems(deleteCount: number) {
+    Array.from({ length: deleteCount }).forEach(() => {
+      this.$target.removeChild(this.$target.lastChild!);
+    });
   }
 
   async attach() {
-    this.$target.innerHTML += this.template();
+    this.$target.innerHTML += TEMPLATE;
+    this.page += 1;
     const { movies, totalPages } = await this.fetchMovies(this.page);
-    Array.from({ length: 20 }).forEach(() => {
-      this.$target.removeChild(this.$target.lastChild!);
-    });
-    this.$target.append(...movies.map(movie => new MovieItem(movie).$target));
 
+    this.paintOverwrite(movies);
     if (this.$target.parentElement === null) return;
 
     const $moreButton = dom.getElement(this.$target.parentElement, '#more-button');
     if (this.page === totalPages) $moreButton.classList.add('hidden');
-    this.page += 1;
   }
 
   async fetchMovies(page: number) {
@@ -64,12 +75,13 @@ class MovieListContainer {
     const mode = urlSearchParams.get('mode') ?? 'popular';
     const title = urlSearchParams.get('title') ?? '';
 
-    const movies = mode === 'search' ? await searchMoviesByTitle(title, page) : await getPopularMovies(this.page);
+    const movies = mode === 'search' ? await searchMoviesByTitle(title, page) : await getPopularMovies(page);
     return movies;
   }
 
   initPageNumber() {
     this.page = 1;
+    this.moviesCount = 0;
   }
 
   handleErrorToast(errorMessage: string) {

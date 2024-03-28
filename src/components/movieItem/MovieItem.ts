@@ -3,43 +3,42 @@ import './MovieItem.css';
 import { IMovie } from '../../types/movie';
 import { dom } from '../../utils/dom';
 
+const TEMPLATE = `
+  <a href="#">
+    <article class="item-card">
+      <img class="item-thumbnail skeleton" loading="lazy" alt="" />
+      <h3 class="item-title"></h3>
+      <div class="item-caption">
+        <p class="item-score"></p>
+        <img class="item-star-icon" src="./images/star_filled.png" alt="별점" />
+      </div>
+    </article>
+  </a>
+`;
+
 class MovieItem {
   $target: HTMLElement;
 
   constructor(movie: IMovie) {
     this.$target = document.createElement('li');
-    this.$target.innerHTML = this.template();
+    this.$target.innerHTML = TEMPLATE;
     this.paint(movie);
-  }
-
-  template() {
-    return `   
-        <a href="#">
-          <div class="item-card">
-          <img
-          class="item-thumbnail skeleton"
-          loading="lazy"
-          alt=""
-        />
-        <p class="item-title"></p>
-        <div class="item-caption">
-          <p class="item-score"></p>
-          <img class="item-star-icon" src="./images/star_filled.png" alt="별점" />
-        </div>
-        </div>
-        </a>
-      `;
   }
 
   paint(movie: IMovie) {
     const $image = dom.getElement<HTMLImageElement>(this.$target, '.item-thumbnail');
-    const $title = dom.getElement<HTMLParagraphElement>(this.$target, '.item-title');
-    const $score = dom.getElement<HTMLParagraphElement>(this.$target, '.item-score');
+    const $title = dom.getElement(this.$target, '.item-title');
+    const $score = dom.getElement(this.$target, '.item-score');
 
     $image.setAttribute('src', movie.imageSrc);
     $image.setAttribute('alt', movie.title);
-    $title.textContent = movie.title;
-    $score.textContent = movie.score.toString();
+    $title.innerText = movie.title;
+    $score.textContent = this.#formatScore(movie.score);
+  }
+
+  #formatScore(score: number) {
+    const FORMAT_FIXED_DIGIT = 1;
+    return score.toFixed(FORMAT_FIXED_DIGIT).toString();
   }
 }
 
