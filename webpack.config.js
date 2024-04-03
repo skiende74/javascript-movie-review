@@ -24,7 +24,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html',
-      publicPath: isProduction ? '/javascript-movie-review/dist/' : '.',
+      publicPath: isProduction ? './javascript-movie-review/dist/' : '.',
     }),
     new DotEnv(),
   ],
