@@ -19,21 +19,26 @@ header h1 {
   color: #f33f3f;
 }
 
-header > .search-box {
+header .search-box {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: #fff;
+
+  width: 100%;
+  max-width: 300px;
   padding: 8px;
   border-radius: 4px;
+
+  transition: all 500ms ease-in-out;
 }
 
 header .search-box > input {
   border: 0;
+  background-color: transparent;
 }
 
 header .search-box > .search-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   border: 0;
   background: transparent no-repeat 0 1px;
 }
@@ -41,6 +46,9 @@ header .search-box > .search-button {
 @media screen and (max-width: 767px) {
   #search-input {
     display: none;
+  }
+  header .search-box {
+    max-width: 40px;
   }
 }
 

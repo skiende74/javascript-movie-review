@@ -3,9 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const DotEnv = require('dotenv-webpack');
 
 const isProduction = process.env.NODE_ENV === 'production';
+
 module.exports = {
   entry: './src/index.ts',
-  mode: 'development',
+  mode: isProduction ? 'production' : 'development',
   resolve: {
     extensions: ['.ts', '.js'],
   },
