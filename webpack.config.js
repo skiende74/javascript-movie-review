@@ -16,7 +16,7 @@ module.exports = {
     historyApiFallback: true,
   },
   output: {
-    publicPath: '.',
+    publicPath: isProduction ? '/javascript-movie-review/dist/' : '.',
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
@@ -24,7 +24,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html',
-      publicPath: isProduction ? './javascript-movie-review/dist/' : '.',
+      publicPath: isProduction ? '/javascript-movie-review/dist/' : '.',
     }),
     new DotEnv(),
   ],
